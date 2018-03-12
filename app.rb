@@ -77,7 +77,9 @@ class HangpersonApp < Sinatra::Base
     ### YOUR CODE HERE ###
 	if @game.word_with_guesses == @game.word and @game.wrong_guesses.length <= 7
 		erb :win
-    end # You may change/remove this line
+    else
+		redirect '/show'
+	end# You may change/remove this line
 	
   end
   
@@ -85,6 +87,8 @@ class HangpersonApp < Sinatra::Base
     ### YOUR CODE HERE ###
 	if @game.word_with_guesses != @game.word and @game.wrong_guesses.length >=7
 		erb :lose
+	else
+		redirect '/show'
     end # You may change/remove this line
   end
   
