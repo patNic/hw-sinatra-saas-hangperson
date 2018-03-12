@@ -24,7 +24,7 @@ class HangpersonApp < Sinatra::Base
   get '/new' do
     erb :new
   end
-
+  
   post '/create' do
     # NOTE: don't change next line - it's needed by autograder!
     word = params[:word] || HangpersonGame.get_random_word
@@ -39,36 +39,53 @@ class HangpersonApp < Sinatra::Base
   # If a guess is invalid, set flash[:message] to "Invalid guess."
   post '/guess' do
     letter = params[:guess].to_s[0]
-	if !(letter =~ /[A-Za-z]/) || letter.nil? or letter == ''
+    ### YOUR CODE HERE ###
+	if letter=="" || !(letter =~ /[A-Za-z]/) || letter.nil?
 		flash[:message] = "Invalid guess."
 	else
 		if !(@game.guesses.include? letter)
-			@game.guess(letter)
+			if !(@game.wrong_guesses.include? letter)
+				@game.guess letter
+			else
+				flash[:message] = "You have already used that letter."
+			end
+			
 		else
 			flash[:message] = "You have already used that letter."
 		end
 	end
     redirect '/show'
   end
- 
+  
+  # Everytime a guess is made, we should eventually end up at this route.
+  # Use existing methods in HangpersonGame to check if player has
+  # won, lost, or neither, and take the appropriate action.
+  # Notice that the show.erb template expects to use the instance variables
+  # wrong_guesses and word_with_guesses from @game.
   get '/show' do
-   if @game.check_win_or_lose == :win
-		erb :win
+    ### YOUR CODE HERE ###
+	if @game.check_win_or_lose == :win
+		redirect '/win'
 	elsif @game.check_win_or_lose == :lose
-		erb :lose
+		redirect '/lose'
 	else
-		erb :show
+		erb :show 
 	end
   end
   
   get '/win' do
     ### YOUR CODE HERE ###
-    erb :win # You may change/remove this line
+	if @game.word_with_guesses == @game.word and @game.wrong_guesses.length <= 7
+		erb :win
+    end # You may change/remove this line
+	
   end
   
   get '/lose' do
     ### YOUR CODE HERE ###
-    erb :lose # You may change/remove this line
+	if @game.word_with_guesses != @game.word and @game.wrong_guesses.length >=7
+		erb :lose
+    end # You may change/remove this line
   end
   
 end
